@@ -3,6 +3,14 @@ pluginManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
+        //        maven {
+//            setAllowInsecureProtocol(true)
+//            url "https://dl.bintray.com/swallowsonny/ext"
+//        }
+        maven {
+            setAllowInsecureProtocol(true)
+            url "https://jitpack.io"
+        }
     }
 }
 dependencyResolutionManagement {
@@ -10,7 +18,16 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+//        maven {
+//            setAllowInsecureProtocol(true)
+//            url "https://dl.bintray.com/swallowsonny/ext"
+//        }
+        maven {
+            setAllowInsecureProtocol(true)
+            url "https://jitpack.io"
+        }
     }
 }
 rootProject.name = "W3ProOTA"
 include ':app'
+include ':serialhelperlibrary'
