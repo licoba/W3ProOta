@@ -30,4 +30,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "W3ProOTA"
 include ':app'
-include ':serialhelperlibrary'
+include ':libserialhelper'

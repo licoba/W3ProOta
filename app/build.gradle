@@ -62,7 +62,7 @@ dependencies {
     implementation 'androidx.compose.material3:material3'
 
     // 串口通信库
-    implementation project(":serialhelperlibrary")
+    implementation project(":libserialhelper")
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
     // 检测内存泄露问题

@@ -1,4 +1,4 @@
-package com.sjx.serialhelperlibrary
+package com.tmk.libserialhelper
 
 import com.hoho.android.usbserial.driver.UsbSerialPort
 

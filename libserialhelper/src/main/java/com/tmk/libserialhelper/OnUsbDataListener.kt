@@ -1,4 +1,4 @@
-package com.sjx.serialhelperlibrary
+package com.tmk.libserialhelper
 
 interface OnUsbDataListener {
     /**

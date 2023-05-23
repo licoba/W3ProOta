@@ -13,13 +13,13 @@ import com.kongzue.dialogx.dialogs.WaitDialog
 import com.kongzue.dialogx.interfaces.OnMenuItemClickListener
 import com.licoba.w3pro0ta.FileUtil.getCheckSum
 import com.licoba.w3pro0ta.databinding.ActivityMainBinding
-import com.sjx.serialhelperlibrary.DataConversion.decodeHexString
-import com.sjx.serialhelperlibrary.DataConversion.encodeHexString
-import com.sjx.serialhelperlibrary.OnUsbDataListener
-import com.sjx.serialhelperlibrary.OnUsbStatusChangeListener
-import com.sjx.serialhelperlibrary.SerialConfig
-import com.sjx.serialhelperlibrary.SerialHelper
-import com.sjx.serialhelperlibrary.W3ProCMD
+import com.tmk.libserialhelper.DataConversion.decodeHexString
+import com.tmk.libserialhelper.DataConversion.encodeHexString
+import com.tmk.libserialhelper.OnUsbDataListener
+import com.tmk.libserialhelper.OnUsbStatusChangeListener
+import com.tmk.libserialhelper.SerialConfig
+import com.tmk.libserialhelper.SerialHelper
+import com.tmk.libserialhelper.W3ProCMD
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

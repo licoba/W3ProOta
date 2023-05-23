@@ -1,4 +1,4 @@
-package com.sjx.serialhelperlibrary
+package com.tmk.libserialhelper
 
 import android.hardware.usb.UsbDevice
 

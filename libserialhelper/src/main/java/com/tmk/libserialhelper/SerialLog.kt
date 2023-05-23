@@ -1,4 +1,4 @@
-package com.sjx.serialhelperlibrary
+package com.tmk.libserialhelper
 
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE

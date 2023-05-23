@@ -1,4 +1,4 @@
-package com.sjx.serialhelperlibrary;
+package com.tmk.libserialhelper;
 
 /**
  *  数据转换工具类

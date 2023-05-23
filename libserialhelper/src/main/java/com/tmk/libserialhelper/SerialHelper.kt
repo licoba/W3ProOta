@@ -1,4 +1,4 @@
-package com.sjx.serialhelperlibrary
+package com.tmk.libserialhelper
 
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
@@ -21,7 +21,7 @@ import java.lang.IllegalArgumentException
 import java.util.concurrent.Executors
 
 abstract class SerialHelper(serialConfig: SerialConfig) : CheckFullFrame {
-    private val ACTION_USB_PERMISSION = "com.sjx.serialhelperlibrary.USB_PERMISSION"
+    private val ACTION_USB_PERMISSION = "com.tmk.libserialhelper.USB_PERMISSION"
     private val onUsbStatusChangeListeners = ArrayList<OnUsbStatusChangeListener>()
     private val onUsbDataListeners = ArrayList<OnUsbDataListener>()
     private var usbManager: UsbManager? = null

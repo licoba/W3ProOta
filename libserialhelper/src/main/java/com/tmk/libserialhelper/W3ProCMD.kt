@@ -1,4 +1,4 @@
-package com.sjx.serialhelperlibrary
+package com.tmk.libserialhelper
 
 enum class W3ProCMD(val content: String,val hexContent:String) {
     // 客户端发送的指令
