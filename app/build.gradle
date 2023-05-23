@@ -7,6 +7,16 @@ android {
     namespace 'com.licoba.w3pro0ta'
     compileSdk 33
 
+
+    // 签名文件信息
+    signingConfigs {
+        releaseConfig {
+            storeFile file("../doc/licoba.keystore")
+            storePassword "123456"
+            keyAlias "key0"
+            keyPassword "123456"
+        }
+    }
     defaultConfig {
         applicationId "com.licoba.w3pro0ta"
         minSdk 24
@@ -24,15 +34,11 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.releaseConfig
+
         }
     }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
+
     buildFeatures {
         compose true
         viewBinding = true
