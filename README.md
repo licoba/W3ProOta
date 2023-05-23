@@ -1,6 +1,6 @@
 # W3ProOTA
 
-> W3Pro的OTA项目，采用串口进行升级，基于C的升级代码Demo，用Kotlin重写，在Android层实现。
+> W3Pro的UPD升级项目，采用串口进行升级，基于C的升级代码Demo，用Kotlin重写，在Android层实现。
 
 ## 说明
 
