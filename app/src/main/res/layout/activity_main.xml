@@ -7,26 +7,76 @@
     android:paddingHorizontal="24dp"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/btn_init_port"
-        android:text="初始化串口"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_marginTop="20dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
 
-    <Button
-        android:id="@+id/btn_send_data"
-        android:text="发送数据"
-        app:layout_constraintTop_toBottomOf="@+id/btn_init_port"
-        android:layout_marginTop="12dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/btn_init_port"
+            android:text="初始化串口"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/btn_choose_upd_file"
+            android:text="选择升级文件"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+
+        <Button
+            android:id="@+id/btn_send_data"
+            android:text="开始请求升级"
+            app:layout_constraintTop_toBottomOf="@+id/btn_init_port"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+
+
+
+        <Button
+            android:id="@+id/btn_send_first_cmd"
+            android:text="发送第一包指令"
+            app:layout_constraintTop_toBottomOf="@+id/btn_send_data"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+
+        <Button
+            android:id="@+id/btn_send_first_file_data"
+            android:text="发送第一包升级数据"
+            app:layout_constraintTop_toBottomOf="@+id/btn_send_first_cmd"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+
+    <TextView
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="注意：\n
+1、指令和数据包需要一起发送，间隔不能太长，否则就需要重新开始"
+        android:layout_marginBottom="12dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </TextView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

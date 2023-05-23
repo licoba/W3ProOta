@@ -217,8 +217,9 @@ abstract class SerialHelper(serialConfig: SerialConfig) : CheckFullFrame {
 
 
     fun writeString(str: String) {
-        SerialLog.d("发送字符串数据： $str")
-        usbSerialPort?.write(str.encodeToByteArray(), serialConfig.timeout)
+        val data = str.replace(" ","")
+        SerialLog.d("发送字符串数据： $data")
+        write(DataConversion.decodeHexString(data))
     }
 
     fun write(byteArray: ByteArray) {

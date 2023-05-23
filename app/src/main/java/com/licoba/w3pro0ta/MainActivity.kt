@@ -2,23 +2,17 @@ package com.licoba.w3pro0ta
 
 import android.hardware.usb.UsbDevice
 import android.os.Bundle
-import android.util.Log
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
 import com.blankj.utilcode.util.LogUtils
 import com.kongzue.dialogx.DialogX
+import com.kongzue.dialogx.dialogs.BottomMenu
 import com.kongzue.dialogx.dialogs.PopTip
+import com.kongzue.dialogx.dialogs.TipDialog
+import com.kongzue.dialogx.dialogs.WaitDialog
+import com.kongzue.dialogx.interfaces.OnMenuItemClickListener
+import com.licoba.w3pro0ta.FileUtil.getCheckSum
 import com.licoba.w3pro0ta.databinding.ActivityMainBinding
-import com.licoba.w3pro0ta.ui.theme.W3ProOTATheme
 import com.sjx.serialhelperlibrary.DataConversion.decodeHexString
 import com.sjx.serialhelperlibrary.DataConversion.encodeHexString
 import com.sjx.serialhelperlibrary.OnUsbDataListener
@@ -28,6 +22,7 @@ import com.sjx.serialhelperlibrary.SerialHelper
 import com.sjx.serialhelperlibrary.W3ProCMD
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -39,13 +34,36 @@ class MainActivity : AppCompatActivity() {
     private lateinit var serialHelper: SerialHelper
 
     private lateinit var mBinding: ActivityMainBinding
+    private var mUpdFileName: String = "fw5000_1.upd"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mBinding = ActivityMainBinding.inflate(layoutInflater);
         setContentView(mBinding.root)
+        initThirdLib()
         initSerialPort()
         mBinding.btnInitPort.setOnClickListener { initSerialPort() }
         mBinding.btnSendData.setOnClickListener { sendData() }
+        mBinding.btnSendFirstCmd.setOnClickListener { sendFirstData() }
+        mBinding.btnSendFirstFileData.setOnClickListener { sendFirstFileData() }
+        mBinding.btnChooseUpdFile.setOnClickListener { showChooseFilePop() }
+    }
+
+    private fun initThirdLib() {
+        DialogX.DEBUGMODE = false
+        val mConfig = LogUtils.getConfig()
+        mConfig.apply {
+            globalTag = TAG
+            isLogHeadSwitch = false
+        }
+    }
+
+    private fun showChooseFilePop() {
+        BottomMenu.show(arrayOf("fw5000_1.upd", "fw5000_2.upd"))
+            .setMessage("选择一个升级文件").onMenuItemClickListener =
+            OnMenuItemClickListener { _, text, _ ->
+                mUpdFileName = text.toString()
+                false
+            }
     }
 
 
@@ -54,8 +72,21 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    private fun sendFirstData() {
+        val data = "AA 55 02 00 00 00 00 00 9A 23 00 00 BE 01 00 00"
+        serialHelper.writeString(data)
+    }
+
+    private fun sendFirstFileData() {
+        // 第一包文件的数据
+        val data =
+            "55504401F8470A00C9CEC6CF14000000534D415401000000C08C518C91BA000000000000C4C5D6000C000000100000000101000100500000CBC5D9000800000000000084C7A703C8D5D0C3001C000000010000000000000000000000000000000000000000B6000000020000C4C1D4C14C000000000200000034000000DA00000010080000B80000000A000000D400000006000000360000004000000076000000100000D1BE000000C20000001200000030010000860000003000000000060000DA00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000EA0800425C01000000D48F"
+        serialHelper.writeString(data)
+    }
+
+
     private fun initSerialPort() {
-        LogUtils.d(TAG, "initSerialPort: 开始")
+        LogUtils.d("initSerialPort: 开始")
         // 串口配置
         val serialConfig = SerialConfig()
         serialConfig.autoConnect = true // 默认连接第一个
@@ -72,16 +103,15 @@ class MainActivity : AppCompatActivity() {
             }
         }
         serialHelper.onCreate(this)
-        LogUtils.d(TAG, "initSerialPort: 结束")
+        LogUtils.d("initSerialPort: 结束")
         serialHelper.addOnUsbStatusChangeListener(mUsbStatusChangeListener)
         serialHelper.addOnUsbDataListener(mUsbDataListener)
         mBinding.btnInitPort.isEnabled = false
         PopTip.show("串口初始化成功");
 
-
     }
 
-    val mUsbStatusChangeListener = object : OnUsbStatusChangeListener {
+    private val mUsbStatusChangeListener = object : OnUsbStatusChangeListener {
         override fun onUsbDeviceAttached() {
             LogUtils.i("StatusChange", "onUsbDeviceAttached")
         }
@@ -118,7 +148,7 @@ class MainActivity : AppCompatActivity() {
 
     // 数据监听
 
-    val mUsbDataListener = object : OnUsbDataListener {
+    private val mUsbDataListener = object : OnUsbDataListener {
         override fun onDataError(e: Exception?) {
             // 数据异常
             LogUtils.d("数据监听器", "数据异常 $e")
@@ -138,26 +168,69 @@ class MainActivity : AppCompatActivity() {
         // 注意：contentToString是十六进制数据
         LogUtils.d("数据监听器", "收到了数据  ${encodeHexString(bytes)}")
         if (bytes.decodeToString() == W3ProCMD.RECEIVE_START.content) {
-            PopTip.show("蓝汛已收到开始UPD升级指令");
-        } else if (encodeHexString(bytes) == W3ProCMD.WAIT_READING_DATA.hexContent) { // 比较十六进制是否一致
+            LogUtils.d("蓝汛已收到开始UPD升级指令...")
+            WaitDialog.show("准备升级...");
+//            PopTip.show("蓝汛已收到开始UPD升级指令")
+        } else if (isWaitingDataPkg(bytes)) {
             LogUtils.d("蓝汛等待发送升级包数据...")
-            PopTip.show("蓝汛等待发送升级包数据...")
+//            PopTip.show("蓝汛等待发送升级包数据...")
+            WaitDialog.show("正在升级中...");
             sendUpdData(bytes)
+        } else if (isCheckUartPkg(bytes)) {  // 直接原封不动返回这个包即可
+            LogUtils.d("蓝汛等待回复确认为upd模式...")
+            PopTip.show("蓝汛等待回复确认为upd模式...")
+            serialHelper.write(bytes)
+        } else if (isUpdFinishPkg(bytes)) {
+            LogUtils.d("升级完成！！！")
+            TipDialog.show("升级完成!", WaitDialog.TYPE.SUCCESS);
         }
     }
 
 
-    fun sendUpdData(receiveBytes: ByteArray) {
+    /**
+     * 判断是不是等待我们发送数据的包，
+     * 有一个特征就是以SIGN:55AA CMD:02 开头
+     */
+    private fun isWaitingDataPkg(bytes: ByteArray): Boolean {
+        return encodeHexString(bytes).uppercase().startsWith("AA5502")
+    }
+
+
+    /**
+     * 是否是检查Upd模式的包，如果是，就按照文档，直接返回就行了
+     */
+    private fun isCheckUartPkg(bytes: ByteArray): Boolean {
+        return encodeHexString(bytes).uppercase().startsWith("AA5501")
+    }
+
+
+    /**
+     * 是否是升级完成的包，如果是，那么提示用户就行了
+     */
+    private fun isUpdFinishPkg(bytes: ByteArray): Boolean {
+        return encodeHexString(bytes).uppercase().startsWith("AA5503")
+    }
+
+    fun sendUpdData(bytes: ByteArray) {
         lifecycleScope.launch {
             delay(5)
+            val rxCmd = UartUpdMRxCmd().apply { parseSelf(bytes) }  // 接收的指令包
+            val txCmd = UartUpdMTxCmd().apply { parseSelf(bytes) }  // 发送的指令包
+            // 获取512字节的文件
             val context = this@MainActivity
-            val fileName = "fw5000_1.upd"
-            val byteArray = FileUtil.readBytesFromAsset(context, fileName, 0, 512)
-            byteArray?.let {
-                serialHelper.write(byteArray)
+            LogUtils.d("收到的txCmd： ${txCmd.printString()}")
+            val byteArrayFile =
+                FileUtil.readBytesFromAsset(context, mUpdFileName, txCmd.addr.toInt(), 512)
+            byteArrayFile?.let {
+                // 首先是512固件包的数据求和
+                txCmd.data_crc = getCheckSum(byteArrayFile, 512)
+                // 然后是指令求和
+                val sum = getCheckSum(txCmd.toByteArray(), 12)
+                txCmd.crc = sum.toUShort()
+                serialHelper.write(txCmd.toByteArray())
+                serialHelper.write(it)
             }
         }
-
     }
 
 
