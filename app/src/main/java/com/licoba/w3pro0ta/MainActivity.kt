@@ -11,7 +11,7 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.kongzue.dialogx.dialogs.TipDialog
 import com.kongzue.dialogx.dialogs.WaitDialog
 import com.kongzue.dialogx.interfaces.OnMenuItemClickListener
-import com.licoba.w3pro0ta.FileUtil.getCheckSum
+import com.licoba.w3pro0ta.MyUtil.getCheckSum
 import com.licoba.w3pro0ta.databinding.ActivityMainBinding
 import com.tmk.libserialhelper.DataConversion.decodeHexString
 import com.tmk.libserialhelper.DataConversion.encodeHexString
@@ -215,13 +215,13 @@ class MainActivity : AppCompatActivity() {
     fun sendUpdData(bytes: ByteArray) {
         lifecycleScope.launch {
             delay(5)
-            val rxCmd = UartUpdMRxCmd().apply { parseSelf(bytes) }  // 接收的指令包
+//            val rxCmd = UartUpdMRxCmd().apply { parseSelf(bytes) }  // 接收的指令包
             val txCmd = UartUpdMTxCmd().apply { parseSelf(bytes) }  // 发送的指令包
             // 获取512字节的文件
             val context = this@MainActivity
             LogUtils.d("解析后的txCmd： ${txCmd.printString()}")
             val byteArrayFile =
-                FileUtil.readBytesFromAsset(context, mUpdFileName, txCmd.addr.toInt(), 512)
+                MyUtil.readBytesFromAsset(context, mUpdFileName, txCmd.addr.toInt(), 512)
             byteArrayFile?.let {
                 // 首先是512固件包的数据求和
                 txCmd.data_crc = getCheckSum(byteArrayFile, 512)

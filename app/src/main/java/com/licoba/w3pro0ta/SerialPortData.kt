@@ -1,9 +1,5 @@
 package com.licoba.w3pro0ta
 
-import androidx.compose.ui.text.toUpperCase
-import com.licoba.w3pro0ta.FileUtil.toHexStringByte
-import com.licoba.w3pro0ta.FileUtil.toHexStringInt
-import com.licoba.w3pro0ta.FileUtil.toHexStringShort
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.Locale
@@ -95,24 +91,6 @@ data class UartUpdMTxCmd(
         return byteBuffer.array()
     }
 
-
-    override fun toString(): String {
-        var str = ""
-//        str = "sign:${toHexStringShort(sign)} " +
-//                "cmd:${toHexStringByte(cmd)} " +
-//                "status:${toHexStringByte(status)} " +
-//                "addr:${toHexStringInt(addr)} " +
-//                "data_crc:${toHexStringInt(data_crc)} " +
-//                "crc:${toHexStringShort(crc)} " +
-//                "end:${toHexStringShort(end)} "
-        str = "sign:${sign.toString(16).uppercase(Locale.ROOT)} " +
-                "cmd:${cmd.toString(16).uppercase(Locale.ROOT)} " +
-                "status:${status.toString(16).uppercase(Locale.ROOT)} " +
-                "addr:${addr.toString(16).uppercase(Locale.ROOT)} " +
-                "data_crc:${data_crc.toString(16).uppercase(Locale.ROOT)} " +
-                "crc:${crc.toString(16).uppercase(Locale.ROOT)} "
-        return str
-    }
 
 
     fun printString(): String {

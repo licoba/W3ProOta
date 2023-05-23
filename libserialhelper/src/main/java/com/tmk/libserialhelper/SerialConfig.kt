@@ -12,7 +12,7 @@ class SerialConfig {
     var doubleBufferSize = 30 // 30个大小, 双缓冲的容器大小
     var readInterval: Long = 10L // 读取休眠间隔，单位ms，这个值不能太大，读取速度要大于写入速度
 
-    var timeout = 2000
+    var timeout = 2000 // 超时时间
 
     var dtr = true
     var rts = true

@@ -21,7 +21,7 @@ import java.lang.IllegalArgumentException
 import java.util.concurrent.Executors
 
 object SerialLog {
-    val TAG = "SerialLog"
+    private const val TAG = "SerialLog"
 
     var openDebug = true
 
