@@ -54,6 +54,7 @@ class MainActivity : AppCompatActivity() {
         mConfig.apply {
             globalTag = TAG
             isLogHeadSwitch = false
+            setBorderSwitch(false)
         }
     }
 
@@ -151,7 +152,7 @@ class MainActivity : AppCompatActivity() {
     private val mUsbDataListener = object : OnUsbDataListener {
         override fun onDataError(e: Exception?) {
             // 数据异常
-            LogUtils.d("数据监听器", "数据异常 $e")
+            LogUtils.d( "数据异常 $e")
 
         }
 
@@ -166,10 +167,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun processReceivedData(bytes: ByteArray) {
         // 注意：contentToString是十六进制数据
-        LogUtils.d("数据监听器", "收到了数据  ${encodeHexString(bytes)}")
+        LogUtils.d("收到了数据  ${encodeHexString(bytes)}")
         if (bytes.decodeToString() == W3ProCMD.RECEIVE_START.content) {
             LogUtils.d("蓝汛已收到开始UPD升级指令...")
-            WaitDialog.show("准备升级...");
+//            WaitDialog.show("准备升级...");
 //            PopTip.show("蓝汛已收到开始UPD升级指令")
         } else if (isWaitingDataPkg(bytes)) {
             LogUtils.d("蓝汛等待发送升级包数据...")
@@ -181,8 +182,8 @@ class MainActivity : AppCompatActivity() {
             PopTip.show("蓝汛等待回复确认为upd模式...")
             serialHelper.write(bytes)
         } else if (isUpdFinishPkg(bytes)) {
-            LogUtils.d("升级完成！！！")
-            TipDialog.show("升级完成!", WaitDialog.TYPE.SUCCESS);
+            LogUtils.d("😁升级完成！！！")
+            TipDialog.show("😁升级完成!", WaitDialog.TYPE.SUCCESS);
         }
     }
 
@@ -218,7 +219,7 @@ class MainActivity : AppCompatActivity() {
             val txCmd = UartUpdMTxCmd().apply { parseSelf(bytes) }  // 发送的指令包
             // 获取512字节的文件
             val context = this@MainActivity
-            LogUtils.d("收到的txCmd： ${txCmd.printString()}")
+            LogUtils.d("解析后的txCmd： ${txCmd.printString()}")
             val byteArrayFile =
                 FileUtil.readBytesFromAsset(context, mUpdFileName, txCmd.addr.toInt(), 512)
             byteArrayFile?.let {
