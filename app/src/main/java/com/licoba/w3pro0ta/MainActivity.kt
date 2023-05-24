@@ -22,6 +22,7 @@ import com.tmk.libserialhelper.SerialHelper
 import com.tmk.libserialhelper.W3ProCMD
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.nio.ByteBuffer
 
 
 class MainActivity : AppCompatActivity() {
@@ -59,7 +60,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showChooseFilePop() {
-        BottomMenu.show(arrayOf("fw5000_1.upd", "fw5000_2.upd"))
+        BottomMenu.show(arrayOf("fwq5000_1.upd", "fw5000_2.upd"))
             .setMessage("选择一个升级文件").onMenuItemClickListener =
             OnMenuItemClickListener { _, text, _ ->
                 mUpdFileName = text.toString()
@@ -152,7 +153,7 @@ class MainActivity : AppCompatActivity() {
     private val mUsbDataListener = object : OnUsbDataListener {
         override fun onDataError(e: Exception?) {
             // 数据异常
-            LogUtils.d( "数据异常 $e")
+            LogUtils.d("数据异常 $e")
 
         }
 
@@ -184,7 +185,46 @@ class MainActivity : AppCompatActivity() {
         } else if (isUpdFinishPkg(bytes)) {
             LogUtils.d("😁升级完成！！！")
             TipDialog.show("😁升级完成!", WaitDialog.TYPE.SUCCESS);
+        } else if (isCommunicationPkg(bytes)) {
+            LogUtils.d("是串口通信协议的数据包")
+            parseProtocolData(bytes)
         }
+    }
+
+    private fun parseProtocolData(byteArray: ByteArray) {
+        val head = byteArray.sliceArray(0..2).toUByteArray()
+        val cmd = byteArray[3]
+        val length = byteArray[4]
+        val data = W3PacketData(
+            result = byteArray[5],
+            mode = byteArray[6],
+            headsetRole = byteArray[7],
+            electric = byteArray[8],
+            voltage = ByteBuffer.wrap(byteArray.sliceArray(9..10)).short,
+            lanXunFirmV = ByteBuffer.wrap(byteArray.sliceArray(11..12)).short,
+            bleMac = byteArray.sliceArray(13..18).toUByteArray(),
+            bleFirmV = ByteBuffer.wrap(byteArray.sliceArray(19..20)).short,
+        )
+        val check = byteArray.last()
+
+        val w3Packet = W3TotalPacket(
+            head = head,
+            cmd = cmd,
+            dataLength = length,
+            data = data,
+            check = check
+        )
+
+        LogUtils.d("解析后的数据：$w3Packet")
+        LogUtils.d(
+            "解析后的数据sum校验和（Kotlin计算的16进制结果）：${
+                crc8Maxim(
+                    byteArray,
+                    byteArray.size - 1
+                ).toHex().uppercase()
+            }"
+        )
+
     }
 
 
@@ -211,6 +251,15 @@ class MainActivity : AppCompatActivity() {
     private fun isUpdFinishPkg(bytes: ByteArray): Boolean {
         return encodeHexString(bytes).uppercase().startsWith("AA5503")
     }
+
+
+    /**
+     * 是否是通讯的包，都以55 AA FF开头
+     */
+    private fun isCommunicationPkg(bytes: ByteArray): Boolean {
+        return encodeHexString(bytes).uppercase().startsWith("55AAFF")
+    }
+
 
     fun sendUpdData(bytes: ByteArray) {
         lifecycleScope.launch {
