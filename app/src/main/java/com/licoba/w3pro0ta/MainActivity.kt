@@ -2,6 +2,7 @@ package com.licoba.w3pro0ta
 
 import SerialUtil.crc8Maxim
 import SerialUtil.getCheckSum
+import android.content.Context
 import android.hardware.usb.UsbDevice
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
@@ -16,6 +17,7 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.kongzue.dialogx.dialogs.TipDialog
 import com.kongzue.dialogx.dialogs.WaitDialog
 import com.kongzue.dialogx.interfaces.OnMenuItemClickListener
+import com.licoba.w3pro0ta.MyUtil.readBytesFromAssets
 import com.licoba.w3pro0ta.databinding.ActivityMainBinding
 import com.tmk.libserialhelper.DataConversion.decodeHexString
 import com.tmk.libserialhelper.DataConversion.encodeHexString
@@ -30,6 +32,9 @@ import com.tmk.libserialhelper.tmk.W3ProUpgradeCMD
 import com.tmk.libserialhelper.tmk.W3SendPacket
 import com.tmk.libserialhelper.tmk.W3TotalPacket
 import com.tmk.libserialhelper.tmk.buildW3ProCmdPkg
+import com.tmk.libserialhelper.tmk.upgrade.UartConfig
+import com.tmk.libserialhelper.tmk.upgrade.UartError
+import com.tmk.libserialhelper.tmk.upgrade.UartOtaManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
@@ -46,25 +51,37 @@ class MainActivity : AppCompatActivity() {
         const val TAG = "😁"
     }
 
+    private lateinit var context: Context
     private lateinit var serialHelper: SerialHelper
     private lateinit var mBinding: ActivityMainBinding
-    private var mUpdFileName: String = "fw5000_2.upd"
-    private var reqUpgradeJob: Job? = null
+    private var mUpdFileName: String = "fw5000_1.upd"
     private var reqDialog: WaitDialog? = null
+    private var otaManager: UartOtaManager? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mBinding = ActivityMainBinding.inflate(layoutInflater);
+        context = this@MainActivity
+        mBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(mBinding.root)
         initThirdLib()
         initSerialPort()
         mBinding.btnInitPort.setOnClickListener { initSerialPort() }
-        mBinding.btnReqUpgrade.setOnClickListener { reqUpgrade() }
         mBinding.btnSendFirstCmd.setOnClickListener { sendFirstData() }
         mBinding.btnSendFirstFileData.setOnClickListener { sendFirstFileData() }
         mBinding.btnChooseUpdFile.setOnClickListener { showChooseFilePop() }
         mBinding.ivClear.setOnClickListener { mBinding.tvLog.text = "" }
         mBinding.tvLog.movementMethod = ScrollingMovementMethod.getInstance()
         mBinding.btnChooseCmd.setOnClickListener { showChooseCmdPop() }
+        mBinding.btnTestOtaSdk.setOnClickListener {
+            if (otaManager == null) {
+                otaManager = UartOtaManager.getInstance(context, serialHelper)
+            }
+            val config = UartConfig().apply {
+                otaData = readBytesFromAssets(context, mUpdFileName)
+            }
+            otaManager?.config = config
+            otaManager?.listener = mUartEventListener
+            otaManager?.startOTA()
+        }
     }
 
     private fun initThirdLib() {
@@ -100,17 +117,6 @@ class MainActivity : AppCompatActivity() {
                 pkg?.let { sendData(pkg.toByteArray()) }
                 false
             }
-    }
-
-
-    private fun reqUpgrade() {
-        reqDialog = WaitDialog.show("正在请求升级...")
-        reqUpgradeJob = lifecycleScope.launch {
-            while (true) {
-                delay(200)
-                sendData(decodeHexString(W3ProUpgradeCMD.START_UPD.hexContent))
-            }
-        }
     }
 
 
@@ -225,37 +231,47 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    private val mUartEventListener = object : UartOtaManager.UartEventListener {
+        override fun onOtaPrepare() {
+            WaitDialog.show("准备中...")
+        }
+
+
+
+        override fun onOtaStart() {
+            WaitDialog.show("升级中...")
+        }
+
+        override fun onOtaProgress(progress: Int) {
+        }
+
+        override fun onOtaStop() {
+        }
+
+        override fun onOtaFinish() {
+            TipDialog.show("升级完成！",WaitDialog.TYPE.SUCCESS)
+        }
+
+        override fun onOtaPause() {
+        }
+
+        override fun onOtaContinue() {
+        }
+
+        override fun onOtaError(err: UartError) {
+            TipDialog.show("升级失败！\n ${err.errDesc}", WaitDialog.TYPE.ERROR)
+        }
+
+    }
+
+
     /***
      * 处理收到的数据（只有数据合法才处理）
      */
     private fun processReceivedData(bytes: ByteArray) {
         // 注意：contentToString是十六进制数据
         LogUtils.d("收到了数据  ${encodeHexString(bytes)}")
-        if (bytes.decodeToString() == W3ProUpgradeCMD.RECEIVE_START.content) {
-            reqUpgradeJob?.cancel()
-            reqDialog?.doDismiss()
-            LogUtils.d("蓝汛已收到开始UPD升级指令...")
-            addText("蓝汛已收到开始UPD升级指令...")
-        } else if (isWaitingDataPkg(bytes)) {
-            LogUtils.d("蓝汛等待发送升级包数据...")
-            addText("蓝汛等待发送升级包数据...")
-            WaitDialog.show("正在升级中...");
-            sendUpdData(bytes)
-        } else if (isCheckUartPkg(bytes)) {  // 直接原封不动返回这个包即可
-            LogUtils.d("蓝汛等待回复确认为upd模式...")
-            addText("蓝汛等待回复确认为upd模式...")
-            sendData(bytes)
-        } else if (isUpdSuccessPkg(bytes)) {
-            addText("收：${encodeHexString(bytes)}")
-            addText("😁升级完成！！！")
-            LogUtils.d("😁升级完成！！！")
-            TipDialog.show("😁升级完成!", WaitDialog.TYPE.SUCCESS);
-        } else if (isUpdFailPkg(bytes)) {
-            addText("收：${encodeHexString(bytes)}")
-            addText("😡升级失败！！！")
-            LogUtils.d("😡升级失败！！！")
-            TipDialog.show("升级失败！", WaitDialog.TYPE.ERROR);
-        } else if (isCommunicationPkg(bytes)) {
+        if (isCommunicationPkg(bytes)) {
             LogUtils.d("是串口通信协议的数据包")
             addText("是串口通信协议的数据包")
             parseProtocolData(bytes)
@@ -298,7 +314,7 @@ class MainActivity : AppCompatActivity() {
                     ).toHex().uppercase()
                 }"
             )
-        }catch (e:Exception){
+        } catch (e: Exception) {
             // 解析失败的原因：
             // 1、数据不是合法的协议格式
             // 2、发送的数据不对，没有任何含义，串口端原封不动地返回了数据
@@ -423,13 +439,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-
-    //清空日志
-    private fun clearText(mTextView: TextView) {
-        mTextView.text = ""
-    }
-
 
     override fun onDestroy() {
         super.onDestroy()

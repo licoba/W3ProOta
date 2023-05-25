@@ -87,6 +87,7 @@
         </TextView>
 
 
+
         <Button
             android:id="@+id/btn_choose_upd_file"
             android:layout_width="match_parent"
@@ -96,15 +97,17 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-
         <Button
-            android:id="@+id/btn_req_upgrade"
+            android:id="@+id/btn_test_ota_sdk"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="开始请求升级"
+            android:text="测试SDK升级"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btn_init_port" />
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+
 
 
         <Button

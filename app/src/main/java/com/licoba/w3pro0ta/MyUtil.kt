@@ -20,8 +20,17 @@ object MyUtil {
         } catch (e: Exception) {
             null
         }
-
     }
+
+
+    fun readBytesFromAssets(context: Context, fileName: String): ByteArray {
+        val inputStream = context.assets.open(fileName)
+        val buffer = ByteArray(inputStream.available())
+        inputStream.read(buffer)
+        inputStream.close()
+        return buffer
+    }
+
 
 
 
