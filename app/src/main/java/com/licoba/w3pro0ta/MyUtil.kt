@@ -23,16 +23,6 @@ object MyUtil {
 
     }
 
-    /**
-     * 求和函数
-     */
-    fun getCheckSum(buf: ByteArray, len: Int): UInt {
-        var crcSum: UInt = 0u
-        for (i in 0 until len) {
-            crcSum += buf[i].toUByte().toUInt()
-        }
-        return crcSum
-    }
 
 
 

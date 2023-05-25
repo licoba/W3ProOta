@@ -7,76 +7,211 @@
     android:paddingHorizontal="24dp"
     tools:context=".MainActivity">
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_marginTop="20dp"
-        app:layout_constraintTop_toTopOf="parent"
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/ll_status"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-
-        <Button
-            android:id="@+id/btn_init_port"
-            android:text="初始化串口"
+        <View
+            android:id="@+id/v_ver_line"
+            android:layout_width="3dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="1dp"
+            android:background="@color/dialogxColorBlue"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            android:text="当前状态："
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/v_ver_line"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </TextView>
+
+        <TextView
+            android:id="@+id/tv_connect_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:text="未连接"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/tv_status"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </TextView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <Button
+        android:id="@+id/btn_init_port"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="初始化串口"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ll_status" />
+
+
+    <LinearLayout
+        android:id="@+id/ll_upgrade"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/my_border"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@+id/btn_init_port">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="升级区"
+            android:textColor="@color/black80"
+            android:textSize="20sp">
+
+        </TextView>
+
 
         <Button
             android:id="@+id/btn_choose_upd_file"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="选择升级文件"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
 
         <Button
-            android:id="@+id/btn_send_data"
+            android:id="@+id/btn_req_upgrade"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="开始请求升级"
-            app:layout_constraintTop_toBottomOf="@+id/btn_init_port"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-
+            app:layout_constraintTop_toBottomOf="@+id/btn_init_port" />
 
 
         <Button
             android:id="@+id/btn_send_first_cmd"
-            android:text="发送第一包指令"
-            app:layout_constraintTop_toBottomOf="@+id/btn_send_data"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="发送第一包升级指令"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            app:layout_constraintTop_toBottomOf="@+id/btn_req_upgrade" />
 
 
         <Button
             android:id="@+id/btn_send_first_file_data"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="发送第一包升级数据"
-            app:layout_constraintTop_toBottomOf="@+id/btn_send_first_cmd"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            app:layout_constraintTop_toBottomOf="@+id/btn_send_first_cmd" />
 
     </LinearLayout>
 
 
-    <TextView
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:text="注意：\n
-1、指令和数据包需要一起发送，间隔不能太长，否则就需要重新开始"
-        android:layout_marginBottom="12dp"
+    <LinearLayout
+        android:id="@+id/ll_data_comm"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/my_border"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@+id/ll_upgrade">
 
-    </TextView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="数据收发区"
+            android:textColor="@color/black80"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btn_choose_cmd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="选择CMD指令"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_req_upgrade" />
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/ll_log"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/my_border"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@+id/ll_data_comm">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="日志区"
+                android:textColor="@color/black80"
+                android:textSize="20sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/iv_clear"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginRight="4dp"
+                android:src="@drawable/clear"
+                android:text="清除日志"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+            </ImageView>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <TextView
+            android:id="@+id/tv_log"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:height="180dp"
+            android:fadeScrollbars="false"
+            android:padding="2dp"
+            android:paddingBottom="4dp"
+            android:scrollbars="vertical"
+            android:textSize="13sp"
+            tools:text="@string/app_name" />
+
+
+    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

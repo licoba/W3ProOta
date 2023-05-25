@@ -16,5 +16,5 @@ class SerialConfig {
 
     var dtr = true
     var rts = true
-    var autoConnect = false
+    var autoConnect = false  // 是否自动连接
 }

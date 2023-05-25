@@ -1,13 +1,15 @@
 package com.tmk.libserialhelper;
 
 /**
- *  数据转换工具类
- *  @author frey
+ * 数据转换工具类
+ *
+ * @author frey
  */
 public class DataConversion {
 
     /**
      * 判断奇数或偶数，位运算，最后一位是1则为奇数，为0是偶数
+     *
      * @param num
      * @return
      */
@@ -17,41 +19,45 @@ public class DataConversion {
 
     /**
      * 将int转成byte
+     *
      * @param number
      * @return
      */
-    public static byte intToByte(int number){
+    public static byte intToByte(int number) {
         return hexToByte(intToHex(number));
     }
 
     /**
      * 将int转成hex字符串
+     *
      * @param number
      * @return
      */
-    public static String intToHex(int number){
+    public static String intToHex(int number) {
         String st = Integer.toHexString(number).toUpperCase();
-        return String.format("%2s",st).replaceAll(" ","0");
+        return String.format("%2s", st).replaceAll(" ", "0");
     }
 
     /**
      * 字节转十进制
+     *
      * @param b
      * @return
      */
-    public static int byteToDec(byte b){
+    public static int byteToDec(byte b) {
         String s = byteToHex(b);
         return (int) hexToDec(s);
     }
 
     /**
      * 字节数组转十进制
+     *
      * @param bytes
      * @return
      */
-    public static int bytesToDec(byte[] bytes){
+    public static int bytesToDec(byte[] bytes) {
         String s = encodeHexString(bytes);
-        return (int)  hexToDec(s);
+        return (int) hexToDec(s);
     }
 
     /**
@@ -66,6 +72,7 @@ public class DataConversion {
 
     /**
      * 字节转十六进制字符串
+     *
      * @param num
      * @return
      */
@@ -78,6 +85,7 @@ public class DataConversion {
 
     /**
      * 十六进制转byte字节
+     *
      * @param hexString
      * @return
      */
@@ -87,17 +95,18 @@ public class DataConversion {
         return (byte) ((firstDigit << 4) + secondDigit);
     }
 
-    private static  int toDigit(char hexChar) {
+    private static int toDigit(char hexChar) {
         int digit = Character.digit(hexChar, 16);
-        if(digit == -1) {
+        if (digit == -1) {
             throw new IllegalArgumentException(
-                    "Invalid Hexadecimal Character: "+ hexChar);
+                    "Invalid Hexadecimal Character: " + hexChar);
         }
         return digit;
     }
 
     /**
      * 字节数组转十六进制
+     *
      * @param byteArray
      * @return
      */
@@ -111,6 +120,7 @@ public class DataConversion {
 
     /**
      * 十六进制转字节数组
+     *
      * @param hexString
      * @return
      */
@@ -128,10 +138,11 @@ public class DataConversion {
 
     /**
      * 十进制转十六进制
+     *
      * @param dec
      * @return
      */
-    public static String decToHex(int dec){
+    public static String decToHex(int dec) {
         String hex = Integer.toHexString(dec);
         if (hex.length() == 1) {
             hex = '0' + hex;
@@ -141,21 +152,22 @@ public class DataConversion {
 
     /**
      * 十六进制转十进制
+     *
      * @param hex
      * @return
      */
-    public static long hexToDec(String hex){
+    public static long hexToDec(String hex) {
         return Long.parseLong(hex, 16);
     }
 
     /**
      * 十六进制转十进制，并对卡号补位
      */
-    public static String setCardNum(String cardNun){
-        String cardNo1= cardNun;
-        String cardNo=null;
-        if(cardNo1!=null){
-            Long cardNo2=Long.parseLong(cardNo1,16);
+    public static String setCardNum(String cardNun) {
+        String cardNo1 = cardNun;
+        String cardNo = null;
+        if (cardNo1 != null) {
+            Long cardNo2 = Long.parseLong(cardNo1, 16);
             //cardNo=String.format("%015d", cardNo2);
             cardNo = String.valueOf(cardNo2);
         }

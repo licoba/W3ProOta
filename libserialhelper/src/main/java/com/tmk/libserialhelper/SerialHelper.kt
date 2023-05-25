@@ -12,13 +12,12 @@ import android.hardware.usb.UsbManager
 import android.os.Handler
 import android.os.Parcelable
 import android.os.SystemClock
-import android.util.Log
 import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
 import com.hoho.android.usbserial.util.SerialInputOutputManager
 import java.io.IOException
-import java.lang.IllegalArgumentException
 import java.util.concurrent.Executors
+
 
 abstract class SerialHelper(serialConfig: SerialConfig) : CheckFullFrame {
     private val ACTION_USB_PERMISSION = "com.tmk.libserialhelper.USB_PERMISSION"
@@ -116,12 +115,13 @@ abstract class SerialHelper(serialConfig: SerialConfig) : CheckFullFrame {
                 onUsbStatusChangeListeners.forEach { it.onUsbDeviceDetached() }
                 // 设备拔出，断开连接
                 disconnectDevice();
-            } else if (ACTION_USB_PERMISSION == action) {
+            } else if (ACTION_USB_PERMISSION == action) { // 代表是USB权限
                 synchronized(this) {
-                    val usbDevice =
-                        intent.getParcelableExtra<Parcelable>(UsbManager.EXTRA_DEVICE) as UsbDevice
-                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
-                        // 用户点击确定，拥有权限
+
+                    val usbManager = mContext?.getSystemService(Context.USB_SERVICE) as UsbManager
+
+                    val usbDevice = usbManager.deviceList.values.first()
+                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) { // USB权限已授予。  // 用户点击确定，拥有权限
                         onUsbStatusChangeListeners.forEach { it.onPermissionGranted() }
                         if (serialConfig.autoConnect) {
                             // 连接设备
@@ -157,7 +157,7 @@ abstract class SerialHelper(serialConfig: SerialConfig) : CheckFullFrame {
 
     // 连接设备
     fun connectDevice(usbDevice: UsbDevice) {
-        // 判断是支持改设备
+        // 判断是否支持该设备
         val availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager)
         if (availableDrivers.isEmpty()) {
             onUsbStatusChangeListeners.forEach { it.onDeviceNotSupport() }
@@ -263,7 +263,7 @@ abstract class SerialHelper(serialConfig: SerialConfig) : CheckFullFrame {
         // 连接设备
         Handler().postDelayed({
             val devices = getAllDevices()
-            if (devices != null && devices.isNotEmpty()) {
+            if (!devices.isNullOrEmpty()) {
                 requestPermission()
             }
         }, 100)
