@@ -56,6 +56,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mBinding: ActivityMainBinding
     private var mUpdFileName: String = "fw5000_1.upd"
     private var reqDialog: WaitDialog? = null
+    private var startDialog: WaitDialog? = null
     private var otaManager: UartOtaManager? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -236,20 +237,24 @@ class MainActivity : AppCompatActivity() {
             WaitDialog.show("准备中...")
         }
 
-
-
         override fun onOtaStart() {
-            WaitDialog.show("升级中...")
+            if (startDialog == null) {
+                startDialog = WaitDialog.show("升级中...")
+            }
         }
 
-        override fun onOtaProgress(progress: Int) {
+        override fun onOtaProgress(progress: Float) {
+            LogUtils.d("升级进度更新： $progress")
+            val str = (progress * 100).toInt()
+            WaitDialog.show("升级中...($str%)")
+
         }
 
         override fun onOtaStop() {
         }
 
         override fun onOtaFinish() {
-            TipDialog.show("升级完成！",WaitDialog.TYPE.SUCCESS)
+            TipDialog.show("升级完成！", WaitDialog.TYPE.SUCCESS)
         }
 
         override fun onOtaPause() {

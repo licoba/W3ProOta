@@ -29,9 +29,11 @@ abstract class SerialHelper(serialConfig: SerialConfig) : CheckFullFrame {
     private var usbSerialPort: UsbSerialPort? = null
     private var usbIoManager: SerialInputOutputManager? = null
     private var connection: UsbDeviceConnection? = null
+
     // 添加双缓冲，提升效率
     private var mDoubleBuffer: Array<ByteArray?>
     private var mDoubleBufferSize = 0
+
     // 读取位置，写入位置
     private var writePosition = 0L // 写入位置
     private var readPosition = 0L  // 读取位置
@@ -121,7 +123,11 @@ abstract class SerialHelper(serialConfig: SerialConfig) : CheckFullFrame {
                     val usbManager = mContext?.getSystemService(Context.USB_SERVICE) as UsbManager
 
                     val usbDevice = usbManager.deviceList.values.first()
-                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) { // USB权限已授予。  // 用户点击确定，拥有权限
+                    if (intent.getBooleanExtra(
+                            UsbManager.EXTRA_PERMISSION_GRANTED,
+                            false
+                        )
+                    ) { // USB权限已授予。  // 用户点击确定，拥有权限
                         onUsbStatusChangeListeners.forEach { it.onPermissionGranted() }
                         if (serialConfig.autoConnect) {
                             // 连接设备
@@ -217,14 +223,19 @@ abstract class SerialHelper(serialConfig: SerialConfig) : CheckFullFrame {
 
 
     fun writeString(str: String) {
-        val data = str.replace(" ","")
+        val data = str.replace(" ", "")
         SerialLog.d("发送字符串数据： $data")
         write(DataConversion.decodeHexString(data))
     }
 
-    fun write(byteArray: ByteArray) {
+    fun write(byteArray: ByteArray, retryCount: Int = 0) {
         SerialLog.d("发送字节数组： ${DataConversion.encodeHexString(byteArray)}")
-        usbSerialPort?.write(byteArray, serialConfig.timeout)
+        try {
+            usbSerialPort?.write(byteArray, serialConfig.timeout)
+        } catch (e: Exception) {
+            SerialLog.e("发送数据失败了！！！ ")
+            write(byteArray, retryCount + 1)
+        }
     }
 
     // 断开连接

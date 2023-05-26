@@ -56,7 +56,7 @@ class UartOtaManager(context: Context, val serialHelper: SerialHelper) {
         logD("发送请求升级命令")
         listener?.onOtaPrepare()
         reqUpgradeJob = CoroutineScope(Dispatchers.IO).launch {
-            repeat(20){
+            repeat(20) {
                 delay(200)
                 sendData(DataConversion.decodeHexString(W3ProUpgradeCMD.START_UPD.hexContent))
             }
@@ -80,7 +80,7 @@ class UartOtaManager(context: Context, val serialHelper: SerialHelper) {
     interface UartEventListener {
         fun onOtaPrepare()  // OTA 升级正在准备，等待蓝汛回复
         fun onOtaStart()  //OTA 升级已经准备好， 开始OTA升级
-        fun onOtaProgress(progress: Int) // OTA升级进度
+        fun onOtaProgress(progress: Float) // OTA升级进度
         fun onOtaStop()
         fun onOtaFinish()
         fun onOtaPause()  //  升级完成
@@ -97,7 +97,6 @@ class UartOtaManager(context: Context, val serialHelper: SerialHelper) {
         if (!config.openLog) return
         Log.e(TAG, str)
     }
-
 
 
     /**
@@ -186,13 +185,16 @@ class UartOtaManager(context: Context, val serialHelper: SerialHelper) {
     }
 
 
-    fun sendUpdData(bytes: ByteArray) {
+    private fun sendUpdData(bytes: ByteArray) {
         CoroutineScope(Dispatchers.IO).launch {
-            delay(5)
+            delay(5)    // 去掉延迟是1分46秒
 //            val rxCmd = UartUpdMRxCmd().apply { parseSelf(bytes) }  // 接收的指令包
             val txCmd = UartUpdMTxCmd().apply { parseSelf(bytes) }  // 发送的指令包
             // 获取512字节的文件
             logD("解析后的txCmd: ${txCmd.printString()}")
+            val start = txCmd.addr.toInt()
+            val percent = start.toFloat() / config.otaData.size
+            listener?.onOtaProgress(percent)
             val byteArrayFile = readByteArray(config.otaData, txCmd.addr.toInt(), 512)
             byteArrayFile?.let {
                 // 首先是512固件包的数据求和
