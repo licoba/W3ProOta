@@ -15,7 +15,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class UartOtaManager(context: Context, val serialHelper: SerialHelper) {
+class UartOtaManager(context: Context, private val serialHelper: SerialHelper) {
 
     private var reqUpgradeJob: Job? = null
 
@@ -45,7 +45,7 @@ class UartOtaManager(context: Context, val serialHelper: SerialHelper) {
     }
 
     companion object {
-        val TAG = UartOtaManager::class.java.simpleName
+        val TAG: String = UartOtaManager::class.java.simpleName
         fun getInstance(context: Context, serialHelper: SerialHelper): UartOtaManager {
             return UartOtaManager(context, serialHelper)
         }

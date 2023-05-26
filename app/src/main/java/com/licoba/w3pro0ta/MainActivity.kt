@@ -65,13 +65,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(mBinding.root)
         initThirdLib()
         initSerialPort()
+        mBinding.btnChooseCmd.setOnClickListener { showChooseCmdPop() }
         mBinding.btnInitPort.setOnClickListener { initSerialPort() }
         mBinding.btnSendFirstCmd.setOnClickListener { sendFirstData() }
         mBinding.btnSendFirstFileData.setOnClickListener { sendFirstFileData() }
         mBinding.btnChooseUpdFile.setOnClickListener { showChooseFilePop() }
         mBinding.ivClear.setOnClickListener { mBinding.tvLog.text = "" }
         mBinding.tvLog.movementMethod = ScrollingMovementMethod.getInstance()
-        mBinding.btnChooseCmd.setOnClickListener { showChooseCmdPop() }
         mBinding.btnTestOtaSdk.setOnClickListener {
             if (otaManager == null) {
                 otaManager = UartOtaManager.getInstance(context, serialHelper)
@@ -327,43 +327,6 @@ class MainActivity : AppCompatActivity() {
             LogUtils.d("解析失败了！ $e")
             addText("err: 数据解析失败！！！请检查数据格式/解析方法")
         }
-
-
-    }
-
-
-    /**
-     * 判断是不是等待我们发送数据的包，
-     * 有一个特征就是以SIGN:55AA CMD:02 开头
-     */
-    private fun isWaitingDataPkg(bytes: ByteArray): Boolean {
-        return encodeHexString(bytes).uppercase().startsWith("AA5502")
-    }
-
-
-    /**
-     * 是否是检查Upd模式的包，如果是，就按照文档，直接返回就行了
-     */
-    private fun isCheckUartPkg(bytes: ByteArray): Boolean {
-        return encodeHexString(bytes).uppercase().startsWith("AA5501")
-    }
-
-
-    /**
-     * 是否是升级完成的包，如果是，那么提示用户就行了
-     */
-    private fun isUpdSuccessPkg(bytes: ByteArray): Boolean {
-        return encodeHexString(bytes).uppercase().startsWith("AA5503FF")
-    }
-
-
-    /**
-     * 是升级失败的包
-     */
-    private fun isUpdFailPkg(bytes: ByteArray): Boolean {
-        // 只有AA5503FF才是升级成功，AA550306就是升级失败了
-        val str = encodeHexString(bytes).uppercase()
-        return str.startsWith("AA5503") && !str.startsWith("AA5503FF")
     }
 
 
@@ -404,7 +367,6 @@ class MainActivity : AppCompatActivity() {
                 byteArray, byteArray.size - 1
             ).toByte()
         ) return false  // 如果校验和不对，那么也不是协议数据
-
         return true
     }
 
@@ -448,7 +410,8 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         serialHelper.onDestory()
-
     }
+
+
 }
 
